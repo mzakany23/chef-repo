@@ -1,0 +1,10 @@
+{
+	"name" : "basic-setup",
+	"run_list" : [
+		"recipe[base]",
+		"recipe[gunicorn]",
+		"recipe[postgresql]",
+		"recipe[nginx]"
+	]
+
+}

@@ -1,0 +1,7 @@
+{
+	"name" : "webserver",
+	"run_list" : [
+		"recipe[nginx]"
+	]
+
+}
