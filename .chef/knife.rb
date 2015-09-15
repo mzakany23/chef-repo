@@ -11,3 +11,4 @@ chef_server_url          "https://api.opscode.com/organizations/mzakany23"
 cache_type               'BasicFile'
 cache_options( :path => "#{ENV['HOME']}/.chef/checksums" )
 cookbook_path            ["#{current_dir}/../cookbooks"]
+knife[:digital_ocean_access_token] = 'c479d23b1d2c185d2f027c983546976a7cebed387a661eddc2f6ec53178fdbba'

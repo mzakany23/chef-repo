@@ -6,8 +6,9 @@ service 'nginx' do
   action [ :enable, :start ]
 end
 
-cookbook_file "/usr/share/nginx/html/index.html" do
-  source "index.html"
-  mode "0644"
+template "/etc/nginx/sites-available/default" do
+  source "default.erb"
+  mode '0755'
+  owner 'root'
 end
 
