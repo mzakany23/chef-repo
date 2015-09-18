@@ -1,5 +1,13 @@
 {
 	"name" : "django-project",
-	"run_list" : ["recipe[base]","recipe[postgresql]","recipe[nginx]","recipe[gunicorn]","recipe[supervisor]","recipe[celery]","recipe[python]","recipe[django-project]"]
+	"run_list" : [
+	"recipe[base]",
+	"recipe[python]",
+	"recipe[postgresql]",
+	"recipe[nginx]",
+	"recipe[gunicorn]",
+	"recipe[supervisor]",
+	"recipe[celery]",
+	"recipe[django-project]"]
 }
 

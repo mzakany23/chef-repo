@@ -1,39 +1,44 @@
-from env_var import ENV
+import sys 
+
+sys.path.append('helper')
+
 from fabric.api import lcd,prefix,env,local,run
+from env_var import ENV
+from minify import Minify
+from os.path import join, isdir, abspath, dirname, realpath
 
-class StaticFileManagment:
-	def __init__(self,**kwargs):
-		self.server_ip      = kwargs['server_ip']
-		self.local_home_dir = kwargs['local_home_dir']
-		self.app_name       = kwargs['app_name']
-		self.local_root_dir = kwargs['local_root_dir']
-		self.host_root_dir  = kwargs['host_root_dir']
+production_app_name  = 'jmi_fundraising_production'
+production 			 = join(dirname(realpath(__file__)),'production')
+production_base_path = join(production, production_app_name)
+tmp_exists 			 = isdir(production)
+app_name			 = 'jmi'
 
-	def push_static_files_to_host(self):
-		self._collect_static()
-		self._rsync_cp_to_host()
+app_host			 = '45.55.47.208'
+cdn_host			 = '45.55.175.19'
 
-	# private
-	def _collect_static(self):
-		with lcd(self.local_home_dir):
-			with prefix('source %sbin/activate' % self.local_home_dir):
-				with lcd(self.app_name):
-					local("python manage.py collectstatic")
+def make_local_production_copy():
+	with lcd('/Users/mzakany/Desktop'):		
+		local("rsync -avz --exclude '.git*' --exclude '.gitignore' /Users/mzakany/Desktop/jmi_fundraising/ %s/jmi_fundraising_production/" % production)
 
-	def _rsync_cp_to_host(self):
-		# rsync -avz root/ root@45.55.231.143:/root/
-		local("rsync -avz %s root@%s:%s" % (self.local_root_dir,self.server_ip,self.host_root_dir))
+def collectstatic():
+	with lcd(production_base_path):
+		with prefix('source %s/bin/activate' % production_base_path):
+			with lcd(app_name):
+				local('python manage.py collectstatic')
 
+def minify_assets():
+	m = Minify('%s/static/root' %production_base_path)
+	m.minify_js()
+	m.minify_css()
 
-def push_static():
-	static_server = StaticFileManagment(
-			server_ip=ENV['host_ip'],
-			local_home_dir='/Users/mzakany/Desktop/jmi_fundraising/',
-			app_name='jmi',
-			local_root_dir='/Users/mzakany/Desktop/jmi_fundraising/static/root/',
-			host_root_dir='/current/root/',
-			)
-	static_server.push_static_files_to_host()
+def deploy_app_to_host():
+	local("rsync -avz --exclude 'static/static' --exclude 'static/media' --exclude 'static/root' %s/ root@%s:/current/%s/" % (production_base_path, app_host, production_app_name ))
+	
+def deploy_static_files():
+	local('rsync -avz %s/static/root root@%s:/current/root/' % (production_base_path, cdn_host))
+	local('rsync -avz %s/static/media root@%s:/current/media/' % (production_base_path, cdn_host))
 
 
 
+
+	
